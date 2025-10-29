@@ -37,6 +37,8 @@
     <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
     <meta name="theme-color" content="#ffffff" />
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg: #000;
@@ -96,6 +98,21 @@
         a:hover {
             opacity: .9;
         }
+
+        .logo-text {
+            font-family: "Inter", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            font-weight: 800;
+            font-size: clamp(4rem, 12vw, 9rem);
+            color: var(--white);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text .a {
+            color: var(--red);
+        }
     </style>
 </head>
 <body>
@@ -103,7 +120,9 @@
     <!-- Accessible text for screen readers -->
     <span class="sr-only">aside network</span>
 
-    <img src="logo.svg" alt="aside.network logo" class="logo"/>
+    <div class="logo-text">
+        <span class="a">a</span>side
+    </div>
 </div>
 
 <footer>
