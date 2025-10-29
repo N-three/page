@@ -22,7 +22,7 @@ html,body,#root{
 .wrap{
 	min-height:100%;
 	display:grid;
-	grid-template-rows: 1fr auto;
+	grid-template-rows: 1fr auto auto; /* hero, keypad-box, footer */
 }
 
 .hero{
@@ -44,17 +44,18 @@ html,body,#root{
 
 .logo .a{ color:var(--red); }
 
-.logo::after{
-	content:"";
+/* Inline caret that follows current input position */
+.caret{
 	display:inline-block;
 	width: .05em;
 	height: .85em;
-	margin-left: .15em;
 	background: currentColor;
 	opacity:.22;
 	transform: translateY(.08em);
 	animation: caret 1.6s steps(1,end) infinite;
 }
+.caret.before{ margin-right: .15em; }
+.caret.after{ margin-left: .15em; }
 
 @keyframes caret{
 	0%, 55% { opacity:.22; }
@@ -81,7 +82,7 @@ footer{
 }
 
 @media (prefers-reduced-motion: reduce){
-	.logo::after{ animation: none; opacity:.18; }
+	.caret{ animation: none; opacity:.18; }
 	.logo:hover{ transition: none; }
 }
 
@@ -106,12 +107,22 @@ footer{
 	border-bottom-color: transparent;
 }
 
-/* Keypad (mobile) */
+/* Keypad layout box (always present to avoid shifts) */
+.keypad-box{
+	display:flex;
+	align-items:flex-start;
+	justify-content:center;
+	padding: 8px var(--pad);
+	min-height: 0; /* default for non-touch */
+}
+@media (pointer: coarse){
+	.wrap{ row-gap: 12px; }
+	.keypad-box{ min-height: 248px; }
+	.hero{ place-items: end center; }
+}
+
+/* Keypad (mobile) - static placement */
 .keypad{
-	position: fixed;
-	left: 50%;
-	transform: translateX(-50%);
-	bottom: max(8px, env(safe-area-inset-bottom));
 	display: grid;
 	gap: 8px;
 	background: rgba(255,255,255,.04);
@@ -119,6 +130,9 @@ footer{
 	border-radius: 12px;
 	padding: 10px;
 	backdrop-filter: blur(6px);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 .keypad .row{ display:flex; gap:8px; justify-content:center; }
 .keypad .key{
@@ -133,7 +147,12 @@ footer{
 	font-family: inherit;
 	font-size: 18px;
 	line-height: 1;
+	-touch-action: manipulation;
+	touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
+.keypad .key *{ -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .keypad .key .num{ display:block; font-size:18px; }
 .keypad .key .letters{ display:block; font-size:11px; opacity:.7; margin-top:4px; letter-spacing:.08em; }
-.keypad .key.back{ min-width: 96px; }
