@@ -1,8 +1,7 @@
 :root{
 	--bg:#000;
 	--fg:#fff;
-	--muted:#f2f2f2;
-	--muted2:#bfbfbf;
+	--muted:#bfbfbf;
 	--red:#e10600;
 	--maxw: 92rem;
 	--pad: clamp(16px, 3vw, 32px);
@@ -90,3 +89,51 @@ footer{
 	footer{ padding-bottom: max(24px, env(safe-area-inset-bottom)); }
 	.hero{ padding-top: max(var(--pad), env(safe-area-inset-top)); }
 }
+
+/* Interactive slots */
+
+.slot{
+	display:inline-block;
+	min-width: .58em;
+	text-align:center;
+	position:relative;
+	padding: 0;
+	border-bottom: .08em solid transparent; /* reserve height to avoid layout shift */
+}
+.slot.narrow{ min-width: .36em; }
+.slot.empty{ border-bottom-color: rgba(255,255,255,.22); }
+.slot.filled{
+	border-bottom-color: transparent;
+}
+
+/* Keypad (mobile) */
+.keypad{
+	position: fixed;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: max(8px, env(safe-area-inset-bottom));
+	display: grid;
+	gap: 8px;
+	background: rgba(255,255,255,.04);
+	border: 1px solid rgba(255,255,255,.08);
+	border-radius: 12px;
+	padding: 10px;
+	backdrop-filter: blur(6px);
+}
+.keypad .row{ display:flex; gap:8px; justify-content:center; }
+.keypad .key{
+	appearance: none;
+	background: rgba(255,255,255,.06);
+	border: 1px solid rgba(255,255,255,.12);
+	color: var(--fg);
+	border-radius: 10px;
+	min-width: 64px;
+	height: 56px;
+	padding: 0 10px;
+	font-family: inherit;
+	font-size: 18px;
+	line-height: 1;
+}
+.keypad .key .num{ display:block; font-size:18px; }
+.keypad .key .letters{ display:block; font-size:11px; opacity:.7; margin-top:4px; letter-spacing:.08em; }
+.keypad .key.back{ min-width: 96px; }
