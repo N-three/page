@@ -1,4 +1,6 @@
 import React from 'react';
+import AdminConsole from './modes/admin/AdminConsole.jsx';
+import { getModeByWord, registerMode } from './modes/modeManager.js';
 
 const INITIAL_WORD = 'aside';
 const MAX_LEN = 5;
@@ -31,6 +33,8 @@ export default function App(){
 	const showKeypad = isTouch && (hasEmpty || keypadSticky);
     const firstEmpty = slots.findIndex(ch => !ch);
     const caretIndex = firstEmpty === -1 ? MAX_LEN : firstEmpty; // place at end when full
+    const [activeMode, setActiveMode] = React.useState(null);
+    const mobileActivationTimerRef = React.useRef(null);
 
 	const bumpKeypadSticky = React.useCallback(() => {
 		setKeypadSticky(true);
@@ -40,14 +44,31 @@ export default function App(){
 
 	React.useEffect(() => () => { if (stickyTimerRef.current) clearTimeout(stickyTimerRef.current); }, []);
 
-	React.useEffect(() => {
+    React.useEffect(() => {
 		setIsTouch(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 	}, []);
 
+    // register modes
+    React.useEffect(() => { registerMode('admin', { name: 'admin', word: 'admin' }); }, []);
+
+    // mobile auto-activation when word matches admin
+    React.useEffect(() => {
+        if (activeMode) return;
+        const word = slots.map(c => c || '').join('');
+        if (isTouch && word.toLowerCase() === 'admin'){
+            if (mobileActivationTimerRef.current) clearTimeout(mobileActivationTimerRef.current);
+            mobileActivationTimerRef.current = setTimeout(() => setActiveMode('admin'), 500);
+        } else {
+            if (mobileActivationTimerRef.current) { clearTimeout(mobileActivationTimerRef.current); mobileActivationTimerRef.current = null; }
+        }
+        return () => { if (mobileActivationTimerRef.current) { clearTimeout(mobileActivationTimerRef.current); mobileActivationTimerRef.current = null; } };
+    }, [slots, isTouch, activeMode]);
+
 	React.useEffect(() => {
 		const onKeyDown = (e) => {
-			const key = e.key;
-			if (isTouch && showKeypad) return;
+            const key = e.key;
+            if (isTouch && showKeypad) return;
+            if (activeMode){ return; }
 			if (key === 'Backspace'){
 				e.preventDefault();
 				setSlots(prev => {
@@ -73,11 +94,19 @@ export default function App(){
 					}
 					return next;
 				});
-			}
+            }
+            if (key === 'Enter'){
+                const word = slots.join('');
+                const mode = getModeByWord(word);
+                if (mode && mode.name === 'admin'){
+                    e.preventDefault();
+                    setActiveMode('admin');
+                }
+            }
 		};
 		window.addEventListener('keydown', onKeyDown);
 		return () => window.removeEventListener('keydown', onKeyDown);
-	}, [isTouch, showKeypad]);
+    }, [isTouch, showKeypad, activeMode, slots]);
 
 	// Touch swipe: left swipe clears last letter
 	const onTouchStart = (e) => {
@@ -206,8 +235,9 @@ export default function App(){
 
 	return (
 		<div className="wrap">
-			<main className="hero" aria-label="aside.network landing" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-				<h1 className="logo" aria-label="interactive word" role="textbox" aria-live="polite">
+            <main className="hero" aria-label="aside.network landing">
+                {!activeMode && (
+                <h1 className="logo" aria-label="interactive word" role="textbox" aria-live="polite">
                 {Array.from({ length: MAX_LEN }).map((_, i) => {
 						const ch = slots[i] || '';
 						const isRedA = i === 0 && ch === 'a';
@@ -227,10 +257,39 @@ export default function App(){
                 {caretIndex === MAX_LEN && (
                     <span className="caret after" aria-hidden="true"></span>
                 )}
-				</h1>
+                {slots.some(ch => ch) && (
+                    <button
+                        className="delete-btn"
+                        aria-label="Delete last letter"
+                        onClick={() => {
+                            setSlots(prev => {
+                                const next = [...prev];
+                                for (let i = next.length - 1; i >= 0; i--){
+                                    if (next[i] && next[i].length){ next[i] = ''; setLastEditIndex(i); break; }
+                                }
+                                return next;
+                            });
+                        }}
+                    >
+                        ⌫
+                    </button>
+                )}
+                </h1>
+                )}
+                {activeMode === 'admin' && (
+                    <div style={{ width:'100%', maxWidth:'900px' }}>
+                        <AdminConsole onExit={() => {
+                            setActiveMode(null);
+                            setSlots(INITIAL_WORD.slice(0, MAX_LEN).split(''));
+                            setLastEditIndex(-1);
+                            setKeypadSticky(false);
+                        }} />
+                    </div>
+                )}
 			</main>
-			<div className={`keypad-box${isTouch ? ' touch' : ''}`} aria-hidden={!showKeypad}>
-				{showKeypad && (
+            {!activeMode && (
+            <div className={`keypad-box${isTouch ? ' touch' : ''}`} aria-hidden={!showKeypad}>
+                {showKeypad && (
 					<div className="keypad" role="group" aria-label="T9 keypad">
 						<div className="row">
 							<button className="key" {...pointerHandlers('1')}>1</button>
@@ -251,8 +310,9 @@ export default function App(){
 							<button className="key" {...pointerHandlers('0')}>0</button>
 						</div>
 					</div>
-				)}
-			</div>
+                )}
+            </div>
+            )}
 
 			<footer>
 				<span>©{year} aside.network</span>

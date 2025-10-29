@@ -14,13 +14,15 @@ html,body,#root{
 	color:var(--fg);
 	font-family:"Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 	font-variation-settings:"wght" 500;
+	font-weight: 500;
 	-webkit-font-smoothing:antialiased;
 	-moz-osx-font-smoothing:grayscale;
 	text-rendering:optimizeLegibility;
 }
 
 .wrap{
-	min-height:100%;
+	height:100%;
+	min-height:0%;
 	display:grid;
 	grid-template-rows: 1fr auto auto; /* hero, keypad-box, footer */
 }
@@ -38,6 +40,7 @@ html,body,#root{
 	line-height:1;
 	letter-spacing:-0.03em;
 	font-variation-settings:"wght" 860;
+	font-weight: 860;
 	font-size: clamp(3.8rem, 12vw, 10rem);
 	user-select:none;
 }
@@ -54,8 +57,8 @@ html,body,#root{
 	transform: translateY(.08em);
 	animation: caret 1.6s steps(1,end) infinite;
 }
-.caret.before{ margin-right: .15em; }
-.caret.after{ margin-left: .15em; }
+.caret.before{ margin-right: 0.0em; }
+.caret.after{ margin-left: 0.0em; }
 
 @keyframes caret{
 	0%, 55% { opacity:.22; }
@@ -99,7 +102,7 @@ footer{
 	text-align:center;
 	position:relative;
 	padding: 0;
-	border-bottom: .08em solid transparent; /* reserve height to avoid layout shift */
+	border-bottom: .06em solid transparent; /* reserve height to avoid layout shift */
 }
 .slot.narrow{ min-width: .36em; }
 .slot.empty{ border-bottom-color: rgba(255,255,255,.22); }
@@ -107,18 +110,136 @@ footer{
 	border-bottom-color: transparent;
 }
 
+/* Delete button for main input */
+.delete-btn{
+	background: transparent;
+	border: none;
+	color: var(--fg);
+	font-size: clamp(1.8rem, 6vw, 2.5rem);
+	margin-left: .3em;
+	opacity: .6;
+	cursor: pointer;
+	padding: 0;
+	line-height: 1;
+	transition: opacity .2s;
+}
+.delete-btn:hover{ opacity: 1; }
+
+/* Console styles */
+
+.console{
+	display:flex;
+	flex-direction:column;
+	gap:12px;
+	width:min(100%, 900px);
+	max-width: min(90vw, 900px);
+	padding: 0 8px;
+	font-family: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+	font-variation-settings:"wght" 600, "slnt" 0;
+	font-weight: 600;
+	font-synthesis: none; /* avoid fake bold/italic */
+	font-optical-sizing: none; /* stabilize Inter width */
+}
+.console *{ font-family: inherit; }
+.console-log{
+	max-height: 32vh;
+	overflow:auto;
+	padding: 8px 0;
+    /*
+    border-top: 1px solid rgba(255,255,255,.08);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+     */
+}
+.console .line{ white-space: pre-wrap; line-height: 1.3; color: var(--muted); font-variation-settings:"wght" 860, "slnt" 0; font-weight: 600; letter-spacing: -0.01em; }
+.console .line.transient{ color: var(--fg); opacity:.85; }
+.console-input{ display:flex; align-items:center; gap:8px; }
+.console-input .prompt{ color: var(--fg); opacity:.9; }
+.console-input .input{
+	flex:1;
+	background: transparent;
+	border: none;
+	outline: none;
+	color: var(--fg);
+	font: inherit;
+}
+
+/* Admin console layout: logo left, input center, delete right */
+.admin-layout{
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+}
+.admin-layout .logo-console{
+	flex-shrink: 0;
+}
+.admin-layout .admin-input{
+	flex: 1;
+	min-width: 0;
+}
+.admin-delete-btn{
+	background: transparent;
+	border: none;
+	color: var(--fg);
+	font-size: 2em;
+	opacity: .6;
+	cursor: pointer;
+	padding: 0;
+	line-height: 1;
+	transition: opacity .2s;
+	flex-shrink: 0;
+}
+.admin-delete-btn:hover{ opacity: 1; }
+
+/* Admin console prompt in logo style (smaller) */
+.logo-console{
+	font-variation-settings:"wght" 860;
+	font-weight: 860;
+	font-size: 3em;
+	letter-spacing: -0.03em;
+	line-height: 1;
+}
+.custom-input{
+	font-family: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+	font-variation-settings:"wght" 860, "slnt" 0;
+	font-weight: 840;
+	font-size: 3em;
+	font-synthesis: none;
+	font-optical-sizing: none;
+	letter-spacing: -0.03em;
+	line-height: 1;
+	background: transparent;
+	border: none;
+	outline: none;
+	color: var(--fg);
+	flex: 1;
+	min-width: 1ch;
+}
+.admin-input{
+	font-family: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+	font-variation-settings:"wght" 840, "slnt" 0;
+	font-weight: 840;
+	font-size: 3em;
+	letter-spacing: -0.03em;
+	line-height: 1;
+	background: transparent;
+	border: none;
+	outline: none;
+	color: var(--fg);
+	flex: 1;
+	min-width: 1ch;
+}
 /* Keypad layout box (always present to avoid shifts) */
 .keypad-box{
 	display:flex;
 	align-items:flex-start;
 	justify-content:center;
 	padding: 8px var(--pad);
-	min-height: 0; /* default for non-touch */
+	min-height: 248px; /* always reserve space */
+	background: var(--bg); /* match background to hide when empty */
 }
 @media (pointer: coarse){
 	.wrap{ row-gap: 12px; }
-	.keypad-box{ min-height: 248px; }
-	.hero{ place-items: end center; }
 }
 
 /* Keypad (mobile) - static placement */
