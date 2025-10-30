@@ -10,8 +10,12 @@ export default function LoginForm({ onSuccess, onClose }){
 
 	React.useEffect(() => { userRef.current?.focus(); }, []);
 
-	const submit = async (e) => {
-		e?.preventDefault();
+	const handleSubmit = async (e) => {
+		console.log('handleSubmit called', e.type);
+		e.preventDefault();
+		if (loading) return; // Prevent double submission
+		if (!username.trim() || !password.trim()) return; // Basic validation
+		
 		setError('');
 		setLoading(true);
 		try{
@@ -31,6 +35,7 @@ export default function LoginForm({ onSuccess, onClose }){
 				expiresAt: now + 5 * 60 * 1000,
 				user: { username }
 			};
+			console.log('LoginForm: calling onSuccess with', mock);
 			onSuccess?.(mock);
 		} catch (err){
 			setError(err.message || 'Login failed');
@@ -40,7 +45,7 @@ export default function LoginForm({ onSuccess, onClose }){
 	};
 
 	return (
-		<form className="login" onSubmit={submit}>
+		<form className="login" onSubmit={handleSubmit}>
 			<div className="login-row">
 				<span className="login-prompt">username: </span>
 				<input ref={userRef} className="login-input" value={username} onChange={(e)=>setUsername(e.target.value)} onKeyDown={(e) => {
@@ -55,7 +60,13 @@ export default function LoginForm({ onSuccess, onClose }){
 				<input ref={passRef} type="password" className="login-input" value={password} onChange={(e)=>setPassword(e.target.value)} onKeyDown={(e) => {
 					if (e.key === 'Enter') {
 						e.preventDefault();
-						submit(e);
+						e.stopPropagation();
+						console.log('Enter pressed in password field');
+						// Trigger form submission
+						const form = e.target.closest('form');
+						if (form) {
+							form.requestSubmit();
+						}
 					}
 				}} />
 			</div>

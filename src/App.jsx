@@ -312,7 +312,7 @@ export default function App() {
         <div className="wrap">
             {session && (
                 <div className="user-info" onClick={() => setSession(null)} style={{cursor: 'pointer'}}>
-                    {session.user.username}
+                    hi {session.user.username}
                 </div>
             )}
             <main className="hero" aria-label="aside.network landing">
@@ -375,13 +375,14 @@ export default function App() {
                         <div className="logo" style={{fontSize: '3em', justifyContent: 'flex-start'}}>
                             <span className="a">l</span>ogin
                         </div>
-                        <LoginForm
-                            onSuccess={(sess) => {
-                                setSession(sess);
-                                setActiveMode(null);
-                            }}
-                            onClose={() => setActiveMode(null)}
-                        />
+                         <LoginForm
+                             onSuccess={(sess) => {
+                                 console.log('App: onSuccess called with', sess);
+                                 setSession(sess);
+                                 setActiveMode(null);
+                             }}
+                             onClose={() => setActiveMode(null)}
+                         />
                     </div>
                 )}
             </main>
